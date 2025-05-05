@@ -12,7 +12,7 @@ class Cadastro extends StatelessWidget {
     return MaterialApp(
       title: "Tela de cadastro de alunos",
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const TelaCadastro(),  // Aqui estamos setando a tela principal
+      home: const TelaCadastro(),  
     );
   }
 }
