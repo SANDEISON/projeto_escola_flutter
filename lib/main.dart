@@ -25,7 +25,7 @@ class TelaCadastro extends StatelessWidget {
     return Scaffold( // Agora adicionamos um Scaffold
       appBar: AppBar(title: const Text('Cadastro de Alunos')),
       body: ListView(
-        padding: const EdgeInsets.all(16), // Adicionando um pouco de padding
+        padding: const EdgeInsets.all(16), 
         children: const [
           TextField(
             decoration: InputDecoration(
@@ -48,7 +48,7 @@ class TelaCadastro extends StatelessWidget {
           ),
           SizedBox(height: 24),
           ElevatedButton(
-            onPressed: null, // O botão ainda não faz nada
+            onPressed: null,
             child: Text('Cadastrar'),
           ),
         ],
