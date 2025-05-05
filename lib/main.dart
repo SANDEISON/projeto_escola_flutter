@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+//projeto
 void main() {
   runApp(const Cadastro());
 }
@@ -22,7 +22,7 @@ class TelaCadastro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold( // Agora adicionamos um Scaffold
+    return Scaffold( 
       appBar: AppBar(title: const Text('Cadastro de Alunos')),
       body: ListView(
         padding: const EdgeInsets.all(16), 
