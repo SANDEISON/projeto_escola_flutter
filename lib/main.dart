@@ -56,4 +56,4 @@ class TelaCadastro extends StatelessWidget {
     );
   }
 }
-// fim do código
+// fim do código da tela cadasztro
