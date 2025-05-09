@@ -55,5 +55,8 @@ class TelaCadastro extends StatelessWidget {
       ),
     );
   }
+telacelsovini
 }
 // fim do código da tela cadasztro
+}
+main
