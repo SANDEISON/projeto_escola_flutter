@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 void main() {
   runApp(const MyApp());
@@ -173,6 +174,12 @@ class ManageSubjectsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> subjects = [
+      'Matemática',
+      'Química',
+      'Física',
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Gerenciar Matérias - $turmaNome'),
@@ -197,9 +204,9 @@ class ManageSubjectsPage extends StatelessWidget {
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                   ),
-                  itemCount: 3, // Quantidade de matérias
+                  itemCount: subjects.length,
                   itemBuilder: (context, index) {
-                    return _buildSubjectCard(context, 'Matéria ${index + 1}');
+                    return _buildSubjectCard(context, subjects[index]);
                   },
                 ),
               ),
@@ -233,7 +240,7 @@ class ManageSubjectsPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ContentPage(subject: subject),
+              builder: (context) => ManageClassContentPage(subject: subject),
             ),
           );
         },
@@ -260,85 +267,204 @@ class ManageSubjectsPage extends StatelessWidget {
   }
 }
 
-class ContentPage extends StatelessWidget {
+class ManageClassContentPage extends StatelessWidget {
   final String subject;
 
-  const ContentPage({super.key, required this.subject});
+  const ManageClassContentPage({super.key, required this.subject});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Conteúdos - $subject'),
+        title: Text('Gerenciar Conteúdo - $subject'),
         backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Conteúdos de Matemática - 1º Ano do Ensino Médio',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Selecione uma opção para gerenciar:',
+              style: TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 15),
+            GridView(
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, // Organiza os botões em 3 colunas
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
               ),
-              const SizedBox(height: 20),
-              const Text(
-                '1º Bimestre: Teoria dos Conjuntos e Conjuntos Numéricos',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                '• Noção de Conjuntos\n'
-                '• Conjuntos Numéricos\n'
-                '• Funções\n'
-                '• Função Afim\n'
-                '• Inequações\n',
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                '2º Bimestre: Sequência e Progressão Aritmética',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                '• Sequências Numéricas\n'
-                '• Progressão Aritmética (PA)\n'
-                '• Função Quadrática\n'
-                '• Inequação do 2º Grau\n'
-                '• Função Modular\n',
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                '3º Bimestre: Potenciação e Função Exponencial',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                '• Potenciação\n'
-                '• Equação Exponencial\n'
-                '• Função Exponencial\n'
-                '• Progressão Geométrica\n'
-                '• Função Logarítmica\n',
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                '4º Bimestre: Matemática Financeira e Geometria',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                '• Matemática Financeira\n'
-                '• Geometria de Triângulos e Quadriláteros\n'
-                '• Razões Trigonométricas\n',
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
+              children: [
+                _buildOptionButton(context, 'Alunos', Icons.person),
+                _buildOptionButton(context, 'Conteúdo', Icons.content_paste),
+                _buildOptionButton(context, 'Notas', Icons.grade),
+                _buildOptionButton(context, 'Frequência', Icons.check_circle),
+                _buildOptionButton(context, 'Avisos', Icons.notifications),
+                _buildOptionButton(context, 'Suporte', Icons.help_outline),
+              ],
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildOptionButton(BuildContext context, String label, IconData icon) {
+    return InkWell(
+      onTap: () {
+        // Navegar para a tela correspondente de gerenciamento
+        // Coloque aqui a navegação para a página correspondente
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => managePage(label),
+          ),
+        );
+      },
+      child: Card(
+        color: Colors.blueAccent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8), // Menor borda para os quadrados
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 30, // Ícone menor para os quadrados pequenos
+              color: Colors.white,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Função para gerenciar as páginas de cada opção
+  Widget managePage(String label) {
+    switch (label) {
+      case 'Alunos':
+        return const ManageStudentsPage();
+      case 'Conteúdo':
+        return const ManageContentPage();
+      case 'Notas':
+        return const ManageGradesPage();
+      case 'Frequência':
+        return const ManageAttendancePage();
+      case 'Avisos':
+        return const ManageNotificationsPage();
+      case 'Suporte':
+        return const ManageSupportPage();
+      default:
+        return const Center(child: Text('Página não encontrada.'));
+    }
+  }
+}
+
+class ManageStudentsPage extends StatelessWidget {
+  const ManageStudentsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gerenciar Alunos'),
+        backgroundColor: Colors.blue,
+      ),
+      body: const Center(
+        child: Text('Aqui você pode gerenciar seus alunos.'),
+      ),
+    );
+  }
+}
+
+class ManageContentPage extends StatelessWidget {
+  const ManageContentPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gerenciar Conteúdo'),
+        backgroundColor: Colors.blue,
+      ),
+      body: const Center(
+        child: Text('Aqui você pode gerenciar o conteúdo da matéria.'),
+      ),
+    );
+  }
+}
+
+class ManageGradesPage extends StatelessWidget {
+  const ManageGradesPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gerenciar Notas'),
+        backgroundColor: Colors.blue,
+      ),
+      body: const Center(
+        child: Text('Aqui você pode gerenciar as notas dos alunos.'),
+      ),
+    );
+  }
+}
+
+class ManageAttendancePage extends StatelessWidget {
+  const ManageAttendancePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gerenciar Frequência'),
+        backgroundColor: Colors.blue,
+      ),
+      body: const Center(
+        child: Text('Aqui você pode gerenciar a frequência dos alunos.'),
+      ),
+    );
+  }
+}
+
+class ManageNotificationsPage extends StatelessWidget {
+  const ManageNotificationsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gerenciar Avisos'),
+        backgroundColor: Colors.blue,
+      ),
+      body: const Center(
+        child: Text('Aqui você pode gerenciar os avisos para a turma.'),
+      ),
+    );
+  }
+}
+
+class ManageSupportPage extends StatelessWidget {
+  const ManageSupportPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gerenciar Suporte'),
+        backgroundColor: Colors.blue,
+      ),
+      body: const Center(
+        child: Text('Aqui você pode gerenciar o suporte para a matéria.'),
       ),
     );
   }
