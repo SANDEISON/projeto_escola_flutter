@@ -59,64 +59,164 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
+  ImageProvider? _getProfileImage() {
+    if (_profileImage != null) {
+      return FileImage(_profileImage!);
+    } else if (_webImage != null) {
+      return MemoryImage(_webImage!);
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Perfil de Usuário'),
-      ),
+        centerTitle: true,
+        title: const Text(
+          'Perfil de Usuário',
+          ),
+          ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            GestureDetector(
-              onTap: _pickImage,
-              child: CircleAvatar(
-                child: (_profileImage == null && _webImage == null)
-                    ? const Icon(Icons.camera_alt)
-                    : null,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16.0),
+              // Removendo a decoração com fundo cinza
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.grey[300]!, // Cor da borda mais suave
+                          width: 3,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.grey[100],
+                        backgroundImage: _getProfileImage(),
+                        child: (_profileImage == null && _webImage == null)
+                            ? const Icon(Icons.camera_alt, size: 40, color: Colors.grey)
+                            : null,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
-            TextField(
-              controller: _loginController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _loginController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: const Icon(Icons.email),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Nome',
+                      prefixIcon: const Icon(Icons.person),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _surnameController,
+                    decoration: InputDecoration(
+                      labelText: 'Sobrenome',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _phoneController,
+                    decoration: InputDecoration(
+                      labelText: 'Telefone',
+                      prefixIcon: const Icon(Icons.phone),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _employeeController,
+                    decoration: InputDecoration(
+                      labelText: 'Funcionário',
+                      prefixIcon: const Icon(Icons.work),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _birthDateController,
+                    decoration: InputDecoration(
+                      labelText: 'Data de Nascimento',
+                      prefixIcon: const Icon(Icons.calendar_today),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        log('Dados salvos!');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[800], // Mudando de azul para cinza escuro
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Salvar',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white, // Garantindo que o texto fique branco
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nome',
-              ),
-            ),
-            TextField(
-              controller: _surnameController,
-              decoration: const InputDecoration(
-                labelText: 'Sobrenome',
-              ),
-            ),
-            TextField(
-              controller: _phoneController,
-              decoration: const InputDecoration(
-                labelText: 'Telefone',
-              ),
-            ),
-            TextField(
-              controller: _employeeController,
-              decoration: const InputDecoration(
-                labelText: 'Funcionário',
-              ),
-            ),
-            TextField(
-              controller: _birthDateController,
-              decoration: const InputDecoration(
-                labelText: 'Data de Nascimento',
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                log('Dados salvos!');
-              },
-              child: const Text('Salvar'),
             ),
           ],
         ),
