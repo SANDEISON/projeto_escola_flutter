@@ -7,116 +7,339 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'App de Escola',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const TeacherHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class TeacherHomePage extends StatelessWidget {
+  const TeacherHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Tela Inicial de Professor'),
+        backgroundColor: Colors.blue,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      drawer: const TeacherDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Bem-vindo, Professor!',
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Suas turmas:',
+              style: TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 15),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(3, (index) {
+                    return _buildClassCard(context, index);
+                  }),
+                ),
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget _buildClassCard(BuildContext context, int index) {
+    String turmaNome = '';
+    if (index == 0) {
+      turmaNome = '1° Ano';
+    } else if (index == 1) {
+      turmaNome = '2° Ano';
+    } else {
+      turmaNome = '3° Ano';
+    }
+
+    return AnimatedContainer(
+      duration: const Duration(seconds: 1),
+      curve: Curves.easeInOut,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.blueAccent,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 5,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          // Navegar para a página de gerenciamento da turma
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ManageSubjectsPage(turmaNome: turmaNome),
+            ),
+          );
+        },
+        splashColor: Colors.blue.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        child: ListTile(
+          leading: const Icon(
+            Icons.class_rounded,
+            size: 40,
+            color: Colors.white,
+          ),
+          title: Text(
+            turmaNome,
+            style: const TextStyle(
+                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+          ),
+          subtitle: const Text(
+            'Clique para gerenciar',
+            style: TextStyle(color: Colors.white60),
+          ),
+          trailing: const Icon(
+            Icons.arrow_forward_ios,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TeacherDrawer extends StatelessWidget {
+  const TeacherDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+            child: Text(
+              'Menu de Navegação',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.account_circle),
+            title: const Text('Perfil'),
+            onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Configurações'),
+            onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Sair'),
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ManageSubjectsPage extends StatelessWidget {
+  final String turmaNome;
+
+  const ManageSubjectsPage({super.key, required this.turmaNome});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Gerenciar Matérias - $turmaNome'),
+        backgroundColor: Colors.blue,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Selecione uma matéria para gerenciar:',
+              style: TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 15),
+            Expanded(
+              child: SingleChildScrollView(
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3, // Organiza os botões em 3 colunas
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemCount: 3, // Quantidade de matérias
+                  itemBuilder: (context, index) {
+                    return _buildSubjectCard(context, 'Matéria ${index + 1}');
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubjectCard(BuildContext context, String subject) {
+    return AnimatedContainer(
+      duration: const Duration(seconds: 1),
+      curve: Curves.easeInOut,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.blueAccent, // Cor igual a das turmas
+        borderRadius: BorderRadius.circular(8), // Tamanho dos quadrados menores
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 5,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          // Navegar para a página de gerenciamento da matéria
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ContentPage(subject: subject),
+            ),
+          );
+        },
+        splashColor: Colors.blue.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.book,
+              size: 30, // Ícone menor para os quadrados pequenos
+              color: Colors.white,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              subject,
+              style: const TextStyle(
+                  color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ContentPage extends StatelessWidget {
+  final String subject;
+
+  const ContentPage({super.key, required this.subject});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Conteúdos - $subject'),
+        backgroundColor: Colors.blue,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Conteúdos de Matemática - 1º Ano do Ensino Médio',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                '1º Bimestre: Teoria dos Conjuntos e Conjuntos Numéricos',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                '• Noção de Conjuntos\n'
+                '• Conjuntos Numéricos\n'
+                '• Funções\n'
+                '• Função Afim\n'
+                '• Inequações\n',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                '2º Bimestre: Sequência e Progressão Aritmética',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                '• Sequências Numéricas\n'
+                '• Progressão Aritmética (PA)\n'
+                '• Função Quadrática\n'
+                '• Inequação do 2º Grau\n'
+                '• Função Modular\n',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                '3º Bimestre: Potenciação e Função Exponencial',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                '• Potenciação\n'
+                '• Equação Exponencial\n'
+                '• Função Exponencial\n'
+                '• Progressão Geométrica\n'
+                '• Função Logarítmica\n',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                '4º Bimestre: Matemática Financeira e Geometria',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                '• Matemática Financeira\n'
+                '• Geometria de Triângulos e Quadriláteros\n'
+                '• Razões Trigonométricas\n',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
