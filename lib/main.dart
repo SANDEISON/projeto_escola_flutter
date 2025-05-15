@@ -83,7 +83,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16.0),
-              // Removendo a decoração com fundo cinza
               child: Column(
                 children: [
                   GestureDetector(
@@ -92,7 +91,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.grey[300]!, // Cor da borda mais suave
+                          color: Colors.grey[300]!, 
                           width: 3,
                         ),
                       ),
@@ -200,7 +199,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         log('Dados salvos!');
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[800], // Mudando de azul para cinza escuro
+                        backgroundColor: Colors.grey[800], 
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -210,7 +209,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white, // Garantindo que o texto fique branco
+                          color: Colors.white, 
                         ),
                       ),
                     ),
