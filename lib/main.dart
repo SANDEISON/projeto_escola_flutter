@@ -11,7 +11,7 @@ class Cadastro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Tela de cadastro de alunos",
+      title: "Tela de cadastro dos alunos",
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
@@ -27,7 +27,7 @@ class TelaCadastro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cadastro de Alunos')),
+      appBar: AppBar(title: const Text('Cadastro dos Alunos')),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
