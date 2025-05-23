@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 void main() {
   runApp(const MyApp());
@@ -315,25 +314,24 @@ class ManageClassContentPage extends StatelessWidget {
     return InkWell(
       onTap: () {
         // Navegar para a tela correspondente de gerenciamento
-        // Coloque aqui a navegação para a página correspondente
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => managePage(label),
+            builder: (context) => _managePage(label),
           ),
         );
       },
       child: Card(
         color: Colors.blueAccent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8), // Menor borda para os quadrados
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              size: 30, // Ícone menor para os quadrados pequenos
+              size: 30,
               color: Colors.white,
             ),
             const SizedBox(height: 10),
@@ -348,7 +346,7 @@ class ManageClassContentPage extends StatelessWidget {
   }
 
   // Função para gerenciar as páginas de cada opção
-  Widget managePage(String label) {
+  Widget _managePage(String label) {
     switch (label) {
       case 'Alunos':
         return const ManageStudentsPage();
@@ -436,8 +434,106 @@ class ManageAttendancePage extends StatelessWidget {
   }
 }
 
-class ManageNotificationsPage extends StatelessWidget {
+class ManageNotificationsPage extends StatefulWidget {
   const ManageNotificationsPage({super.key});
+
+  @override
+  _ManageNotificationsPageState createState() =>
+      _ManageNotificationsPageState();
+}
+
+class _ManageNotificationsPageState extends State<ManageNotificationsPage> {
+  final List<Map<String, String>> _notifications = [
+    {
+      'title': 'Aviso sobre Prova',
+      'description': 'Lembre-se que a prova de Matemática será no dia 15.',
+    },
+    {
+      'title': 'Mudança de Horário',
+      'description': 'O horário da aula de Física foi alterado para às 14h.',
+    },
+    {
+      'title': 'Reunião de Pais',
+      'description': 'A reunião de pais será no dia 20 às 19h na escola.',
+    },
+  ];
+
+  final TextEditingController _controllerTitle = TextEditingController();
+  final TextEditingController _controllerDescription = TextEditingController();
+
+  void _addNotification() {
+    if (_controllerTitle.text.isNotEmpty &&
+        _controllerDescription.text.isNotEmpty) {
+      setState(() {
+        _notifications.add({
+          'title': _controllerTitle.text,
+          'description': _controllerDescription.text,
+        });
+        _controllerTitle.clear();
+        _controllerDescription.clear();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aviso adicionado com sucesso!')),
+      );
+    }
+  }
+
+  void _editNotification(int index) {
+    _controllerTitle.text = _notifications[index]['title']!;
+    _controllerDescription.text = _notifications[index]['description']!;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Editar Aviso'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _controllerTitle,
+                decoration: const InputDecoration(
+                  labelText: 'Título',
+                ),
+              ),
+              TextField(
+                controller: _controllerDescription,
+                decoration: const InputDecoration(
+                  labelText: 'Descrição',
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _notifications[index] = {
+                    'title': _controllerTitle.text,
+                    'description': _controllerDescription.text,
+                  };
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Salvar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteNotification(int index) {
+    setState(() {
+      _notifications.removeAt(index);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Aviso excluído com sucesso!')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -446,15 +542,142 @@ class ManageNotificationsPage extends StatelessWidget {
         title: const Text('Gerenciar Avisos'),
         backgroundColor: Colors.blue,
       ),
-      body: const Center(
-        child: Text('Aqui você pode gerenciar os avisos para a turma.'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Avisos Ativos',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _notifications.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 5,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      title: Text(
+                        _notifications[index]['title']!,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        _notifications[index]['description']!,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () => _editNotification(index),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () => _deleteNotification(index),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Adicionar Novo Aviso',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _controllerTitle,
+              decoration: const InputDecoration(
+                labelText: 'Título do Aviso',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _controllerDescription,
+              decoration: const InputDecoration(
+                labelText: 'Descrição do Aviso',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _addNotification,
+              child: const Text('Adicionar Aviso'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue, // Correção aqui
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class ManageSupportPage extends StatelessWidget {
+class ManageSupportPage extends StatefulWidget {
   const ManageSupportPage({super.key});
+
+  @override
+  _ManageSupportPageState createState() => _ManageSupportPageState();
+}
+
+class _ManageSupportPageState extends State<ManageSupportPage> {
+  final TextEditingController _controller = TextEditingController();
+
+  // Função para mostrar o Dialog de "Mensagem Enviada"
+  void _showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Mensagem Enviada'),
+          content: const Text('Sua mensagem foi enviada com sucesso!'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Fechar'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Fecha o dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Função chamada ao pressionar o botão "Enviar"
+  void _sendMessage() {
+    if (_controller.text.isNotEmpty) {
+      // Aqui você pode implementar o envio de dados para o servidor ou apenas simular o envio
+      _showConfirmationDialog(); // Exibe o diálogo de sucesso
+      _controller.clear(); // Limpa o campo de texto após o envio
+    } else {
+      // Caso o campo de texto esteja vazio, mostra um aviso
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, digite uma mensagem antes de enviar.'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -463,9 +686,84 @@ class ManageSupportPage extends StatelessWidget {
         title: const Text('Gerenciar Suporte'),
         backgroundColor: Colors.blue,
       ),
-      body: const Center(
-        child: Text('Aqui você pode gerenciar o suporte para a matéria.'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Suporte para Professores',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Você pode enviar suas dúvidas ou relatórios aqui.',
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            _buildSupportTopic(
+              title: 'Dúvidas sobre a matéria',
+              description:
+                  'Aqui você pode tirar dúvidas sobre o conteúdo ensinado nas aulas.',
+            ),
+            _buildSupportTopic(
+              title: 'Problemas de frequência',
+              description:
+                  'Caso haja algum problema com a frequência, você pode reportar aqui.',
+            ),
+            _buildSupportTopic(
+              title: 'Feedbacks de avaliações',
+              description:
+                  'Se os alunos tiverem feedbacks sobre as avaliações, este é o local para discutirmos.',
+            ),
+            const SizedBox(height: 20),
+            // Campo de texto para enviar a mensagem
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: 'Digite sua mensagem',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              maxLines: 3,
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _sendMessage, // Envia a mensagem
+              child: const Text('Enviar'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue, // Correção aqui
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildSupportTopic({required String title, required String description}) {
+    return ExpansionTile(
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            description,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ],
     );
   }
 }
