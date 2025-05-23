@@ -35,6 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   syncfusion_flutter_pdf: ^29.1.41
+  syncfusion_flutter_pdfviewer: ^29.2.5
 
 dev_dependencies:
   flutter_test:

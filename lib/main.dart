@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_escola_flutter/Page_PDF/page_gerator_PDF.dart';
+
 
 void main() {
   runApp(const MaterialApp(title: 'Navigation Basics', home: FirstRoute()));
@@ -22,7 +22,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 
 
 class MyHomePage extends StatefulWidget {
