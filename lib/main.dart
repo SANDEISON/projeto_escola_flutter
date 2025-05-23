@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:projeto_escola_flutter/Page_PDF/functions_pdf.dart';
 
 
 void main() {
-  runApp(const MaterialApp(title: 'Navigation Basics', home: FirstRoute()));
+  runApp(const MaterialApp(title: 'Navigation Basics', home: CreatePdfWidget()));
   //runApp(const MyApp());
 }
 
