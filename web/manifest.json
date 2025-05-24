@@ -1,6 +1,6 @@
 {
-    "name": "projeto_escola_flutter",
-    "short_name": "projeto_escola_flutter",
+    "name": "projeto_escolar",
+    "short_name": "projeto_escolar",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
