@@ -355,7 +355,7 @@ class ManageClassContentPage extends StatelessWidget {
       case 'Notas':
         return const ManageGradesPage();
       case 'Frequência':
-        return const ManageAttendancePage();
+        return const ManageAttendancePageExpanded();
       case 'Avisos':
         return const ManageNotificationsPage();
       case 'Suporte':
@@ -417,8 +417,130 @@ class ManageGradesPage extends StatelessWidget {
   }
 }
 
-class ManageAttendancePage extends StatelessWidget {
-  const ManageAttendancePage({super.key});
+enum AttendanceFilter { all, present, absent, undefined }
+
+class ManageAttendancePageExpanded extends StatefulWidget {
+  const ManageAttendancePageExpanded({super.key});
+
+  @override
+  _ManageAttendancePageExpandedState createState() =>
+      _ManageAttendancePageExpandedState();
+}
+
+class _ManageAttendancePageExpandedState extends State<ManageAttendancePageExpanded> {
+  List<Map<String, dynamic>> attendanceRecords = List.generate(
+    25,
+    (index) => {
+      'student': 'Aluno ${index + 1}',
+      'presence': null, // null = não marcado ainda
+    },
+  );
+
+  AttendanceFilter _filter = AttendanceFilter.all;
+
+  void _togglePresence(int index) {
+    setState(() {
+      if (attendanceRecords[index]['presence'] == null) {
+        attendanceRecords[index]['presence'] = true;
+      } else if (attendanceRecords[index]['presence'] == true) {
+        attendanceRecords[index]['presence'] = false;
+      } else {
+        attendanceRecords[index]['presence'] = null;
+      }
+    });
+  }
+
+  void _markAllPresent() {
+    setState(() {
+      for (var record in attendanceRecords) {
+        record['presence'] = true;
+      }
+    });
+  }
+
+  void _markAllAbsent() {
+    setState(() {
+      for (var record in attendanceRecords) {
+        record['presence'] = false;
+      }
+    });
+  }
+
+  void _resetAll() {
+    setState(() {
+      for (var record in attendanceRecords) {
+        record['presence'] = null;
+      }
+    });
+  }
+
+  void _setFilter(AttendanceFilter filter) {
+    setState(() {
+      _filter = filter;
+    });
+  }
+
+  void _showSummary() {
+    int presentCount = attendanceRecords.where((r) => r['presence'] == true).length;
+    int absentCount = attendanceRecords.where((r) => r['presence'] == false).length;
+    int undefinedCount = attendanceRecords.where((r) => r['presence'] == null).length;
+    int total = attendanceRecords.length;
+
+    double presentPercent = (presentCount / total) * 100;
+    double absentPercent = (absentCount / total) * 100;
+    double undefinedPercent = (undefinedCount / total) * 100;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Resumo da Frequência'),
+        content: Text(
+          'Total de alunos: $total\n\n'
+          'Presentes: $presentCount (${presentPercent.toStringAsFixed(1)}%)\n'
+          'Ausentes: $absentCount (${absentPercent.toStringAsFixed(1)}%)\n'
+          'Não Marcados: $undefinedCount (${undefinedPercent.toStringAsFixed(1)}%)',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Fechar'),
+          )
+        ],
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> get _filteredRecords {
+    switch (_filter) {
+      case AttendanceFilter.present:
+        return attendanceRecords.where((r) => r['presence'] == true).toList();
+      case AttendanceFilter.absent:
+        return attendanceRecords.where((r) => r['presence'] == false).toList();
+      case AttendanceFilter.undefined:
+        return attendanceRecords.where((r) => r['presence'] == null).toList();
+      case AttendanceFilter.all:
+      default:
+        return attendanceRecords;
+    }
+  }
+
+  String _presenceText(dynamic presence) {
+    if (presence == true) return 'Presente';
+    if (presence == false) return 'Ausente';
+    return 'Não marcado';
+  }
+
+  Color _presenceColor(dynamic presence) {
+    if (presence == true) return Colors.green;
+    if (presence == false) return Colors.red;
+    return Colors.grey;
+  }
+
+  IconData _presenceIcon(dynamic presence) {
+    if (presence == true) return Icons.check_circle;
+    if (presence == false) return Icons.cancel;
+    return Icons.help_outline;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -426,9 +548,100 @@ class ManageAttendancePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Gerenciar Frequência'),
         backgroundColor: Colors.blue,
+        actions: [
+          PopupMenuButton<AttendanceFilter>(
+            icon: const Icon(Icons.filter_list),
+            onSelected: _setFilter,
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: AttendanceFilter.all,
+                child: Text('Mostrar Todos'),
+              ),
+              const PopupMenuItem(
+                value: AttendanceFilter.present,
+                child: Text('Mostrar Presentes'),
+              ),
+              const PopupMenuItem(
+                value: AttendanceFilter.absent,
+                child: Text('Mostrar Ausentes'),
+              ),
+              const PopupMenuItem(
+                value: AttendanceFilter.undefined,
+                child: Text('Mostrar Não Marcados'),
+              ),
+            ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.done_all),
+            tooltip: 'Marcar Todos Presentes',
+            onPressed: _markAllPresent,
+          ),
+          IconButton(
+            icon: const Icon(Icons.clear_all),
+            tooltip: 'Marcar Todos Ausentes',
+            onPressed: _markAllAbsent,
+          ),
+          IconButton(
+            icon: const Icon(Icons.restart_alt),
+            tooltip: 'Resetar Todas',
+            onPressed: _resetAll,
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'Resumo',
+            onPressed: _showSummary,
+          ),
+        ],
       ),
-      body: const Center(
-        child: Text('Aqui você pode gerenciar a frequência dos alunos.'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const Text(
+              'Controle de Frequência',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text('Filtro: ${_filter.name[0].toUpperCase()}${_filter.name.substring(1)}'),
+            const SizedBox(height: 10),
+            Expanded(
+              child: _filteredRecords.isEmpty
+                  ? const Center(child: Text('Nenhum aluno encontrado com este filtro.'))
+                  : ListView.builder(
+                      itemCount: _filteredRecords.length,
+                      itemBuilder: (context, index) {
+                        final record = _filteredRecords[index];
+                        int originalIndex = attendanceRecords.indexOf(record);
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          child: ListTile(
+                            title: Text(record['student']),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _presenceIcon(record['presence']),
+                                  color: _presenceColor(record['presence']),
+                                ),
+                                const SizedBox(width: 8),
+                                Switch(
+                                  value: record['presence'] == true,
+                                  onChanged: (_) => _togglePresence(originalIndex),
+                                ),
+                              ],
+                            ),
+                            subtitle: Text(
+                              _presenceText(record['presence']),
+                              style: TextStyle(color: _presenceColor(record['presence'])),
+                            ),
+                            onTap: () => _togglePresence(originalIndex),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -618,7 +831,7 @@ class _ManageNotificationsPageState extends State<ManageNotificationsPage> {
               onPressed: _addNotification,
               child: const Text('Adicionar Aviso'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // Correção aqui
+                backgroundColor: Colors.blue,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -642,7 +855,6 @@ class ManageSupportPage extends StatefulWidget {
 class _ManageSupportPageState extends State<ManageSupportPage> {
   final TextEditingController _controller = TextEditingController();
 
-  // Função para mostrar o Dialog de "Mensagem Enviada"
   void _showConfirmationDialog() {
     showDialog(
       context: context,
@@ -654,7 +866,7 @@ class _ManageSupportPageState extends State<ManageSupportPage> {
             TextButton(
               child: const Text('Fechar'),
               onPressed: () {
-                Navigator.of(context).pop(); // Fecha o dialog
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -663,14 +875,11 @@ class _ManageSupportPageState extends State<ManageSupportPage> {
     );
   }
 
-  // Função chamada ao pressionar o botão "Enviar"
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
-      // Aqui você pode implementar o envio de dados para o servidor ou apenas simular o envio
-      _showConfirmationDialog(); // Exibe o diálogo de sucesso
-      _controller.clear(); // Limpa o campo de texto após o envio
+      _showConfirmationDialog();
+      _controller.clear();
     } else {
-      // Caso o campo de texto esteja vazio, mostra um aviso
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Por favor, digite uma mensagem antes de enviar.'),
@@ -717,7 +926,6 @@ class _ManageSupportPageState extends State<ManageSupportPage> {
                   'Se os alunos tiverem feedbacks sobre as avaliações, este é o local para discutirmos.',
             ),
             const SizedBox(height: 20),
-            // Campo de texto para enviar a mensagem
             TextField(
               controller: _controller,
               decoration: InputDecoration(
@@ -730,10 +938,10 @@ class _ManageSupportPageState extends State<ManageSupportPage> {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _sendMessage, // Envia a mensagem
+              onPressed: _sendMessage,
               child: const Text('Enviar'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // Correção aqui
+                backgroundColor: Colors.blue,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
