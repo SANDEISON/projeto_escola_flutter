@@ -69,6 +69,7 @@ lib/
 
 ## 👥 Equipe do Projeto
 
+- **Tela de Login: Leonardo Dantas Andrade de Alencar e João Victor Amorim de Oliveira**
 - **Tela de Coordenador: Lucas Alexandre e Alex Vinicius**
 - **Listar **Turmas** existentes: Pablo de Omena e Gabriel Torres Pinto**
 - **Tela Inicial do Professor: Gabriel Holanda Costa, Victor Milito e Guilherme Soares**
