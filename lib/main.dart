@@ -297,7 +297,6 @@ class ManageClassContentPage extends StatelessWidget {
               ),
               children: [
                 _buildOptionButton(context, 'Alunos', Icons.person),
-                _buildOptionButton(context, 'Conteúdo', Icons.content_paste),
                 _buildOptionButton(context, 'Notas', Icons.grade),
                 _buildOptionButton(context, 'Frequência', Icons.check_circle),
                 _buildOptionButton(context, 'Avisos', Icons.notifications),
@@ -350,8 +349,6 @@ class ManageClassContentPage extends StatelessWidget {
     switch (label) {
       case 'Alunos':
         return const ManageStudentsPage();
-      case 'Conteúdo':
-        return const ManageContentPage();
       case 'Notas':
         return const ManageGradesPage();
       case 'Frequência':
@@ -366,8 +363,91 @@ class ManageClassContentPage extends StatelessWidget {
   }
 }
 
-class ManageStudentsPage extends StatelessWidget {
+class ManageStudentsPage extends StatefulWidget {
   const ManageStudentsPage({super.key});
+
+  @override
+  State<ManageStudentsPage> createState() => _ManageStudentsPageState();
+}
+
+class _ManageStudentsPageState extends State<ManageStudentsPage> {
+  final List<String> _students = List.generate(25, (index) => 'Aluno ${index + 1}');
+  final TextEditingController _nameController = TextEditingController();
+
+  void _addStudent() {
+    _nameController.clear();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Adicionar Aluno'),
+        content: TextField(
+          controller: _nameController,
+          decoration: const InputDecoration(hintText: 'Nome do aluno'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              final name = _nameController.text.trim();
+              if (name.isNotEmpty) {
+                setState(() => _students.add(name));
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Adicionar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editStudent(int index) {
+    _nameController.text = _students[index];
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Editar Aluno'),
+        content: TextField(
+          controller: _nameController,
+          decoration: const InputDecoration(hintText: 'Novo nome do aluno'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              final newName = _nameController.text.trim();
+              if (newName.isNotEmpty) {
+                setState(() => _students[index] = newName);
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteStudent(int index) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Excluir Aluno'),
+        content: Text('Deseja remover "${_students[index]}" da lista?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() => _students.removeAt(index));
+              Navigator.pop(context);
+            },
+            child: const Text('Remover'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -376,32 +456,120 @@ class ManageStudentsPage extends StatelessWidget {
         title: const Text('Gerenciar Alunos'),
         backgroundColor: Colors.blue,
       ),
-      body: const Center(
-        child: Text('Aqui você pode gerenciar seus alunos.'),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addStudent,
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.add),
+        tooltip: 'Adicionar aluno',
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _students.isEmpty
+            ? const Center(child: Text('Nenhum aluno cadastrado.'))
+            : ListView.builder(
+                itemCount: _students.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    child: ListTile(
+                      leading: const Icon(Icons.person),
+                      title: Text(_students[index]),
+                      subtitle: Text('ID: ${index + 1}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.orange),
+                            onPressed: () => _editStudent(index),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteStudent(index),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }
 }
 
-class ManageContentPage extends StatelessWidget {
-  const ManageContentPage({super.key});
+
+class ManageGradesPage extends StatefulWidget {
+  const ManageGradesPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Gerenciar Conteúdo'),
-        backgroundColor: Colors.blue,
-      ),
-      body: const Center(
-        child: Text('Aqui você pode gerenciar o conteúdo da matéria.'),
+  _ManageGradesPageState createState() => _ManageGradesPageState();
+}
+
+class _ManageGradesPageState extends State<ManageGradesPage> {
+  final List<Map<String, dynamic>> _students = List.generate(
+    25,
+    (index) => {
+      'name': 'Aluno ${index + 1}',
+      'grades': List<double>.filled(4, 0.0),
+    },
+  );
+
+  void _editGrades(int index) {
+    final grades = List<double>.from(_students[index]['grades']);
+    final controllers = List.generate(
+      4,
+      (i) => TextEditingController(text: grades[i].toStringAsFixed(1)),
+    );
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Notas - ${_students[index]['name']}'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(4, (i) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: TextField(
+                  controller: controllers[i],
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: 'Nota ${i + 1}',
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _students[index]['grades'] = controllers.map((c) {
+                  final value = double.tryParse(c.text.replaceAll(',', '.')) ?? 0.0;
+                  return value.clamp(0.0, 10.0);
+                }).toList();
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Salvar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+        ],
       ),
     );
   }
-}
 
-class ManageGradesPage extends StatelessWidget {
-  const ManageGradesPage({super.key});
+  double _calculateAverage(List<double> grades) {
+    if (grades.isEmpty) return 0.0;
+    return grades.reduce((a, b) => a + b) / grades.length;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -410,12 +578,36 @@ class ManageGradesPage extends StatelessWidget {
         title: const Text('Gerenciar Notas'),
         backgroundColor: Colors.blue,
       ),
-      body: const Center(
-        child: Text('Aqui você pode gerenciar as notas dos alunos.'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView.builder(
+          itemCount: _students.length,
+          itemBuilder: (context, index) {
+            final student = _students[index];
+            final average = _calculateAverage(student['grades']);
+
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 6),
+              elevation: 2,
+              child: ListTile(
+                title: Text(student['name']),
+                subtitle: Text(
+                  'Notas: ${student['grades'].map((g) => g.toStringAsFixed(1)).join(', ')}\n'
+                  'Média: ${average.toStringAsFixed(2)}',
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.orange),
+                  onPressed: () => _editGrades(index),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 }
+
 
 enum AttendanceFilter { all, present, absent, undefined }
 
