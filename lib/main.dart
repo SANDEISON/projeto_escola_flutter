@@ -1,10 +1,20 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Para o usuário selecionar uma imagem do dispositivo
-import 'dart:io'; // Para manipular arquivos no dispositivo
-import 'package:flutter/foundation.dart'; // Para verificar se o app está rodando na web
-import 'dart:developer';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'dart:io' show File;
+import 'package:image_picker/image_picker.dart';
+import 'package:projeto_escola_flutter/models/user.dart';
+import 'database/database_gen.dart';
+import 'package:flutter/services.dart'; 
 
-void main() => runApp(const MyApp());
+void main() {
+  
+  if (!kIsWeb) {
+    // sqfliteFfiInit();
+    // databaseFactory = databaseFactoryFfi;
+  }
+  runApp(const MyApp());
+}
 
 /// Classe principal do aplicativo
 class MyApp extends StatelessWidget {
@@ -15,6 +25,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Perfil de Usuário',
       home: UserProfileScreen(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('pt', 'BR'),
+        Locale('en', 'US'),
+      ],
     );
   }
 }
@@ -39,6 +58,49 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   // Variáveis para armazenar a imagem do perfil
   File? _profileImage; // Para dispositivos móveis
   Uint8List? _webImage; // Para armazenar a imagem na web
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final user = await getDatabaseService().getUser();  
+    if (user != null) {
+      setState(() {
+        _loginController.text = user.email;
+        _nameController.text = user.name;
+        _surnameController.text = user.surname;
+        _phoneController.text = user.phone;
+        _employeeController.text = user.employee;
+        _birthDateController.text = user.birthDate;
+        if (user.imagePath != null) {
+          _profileImage = File(user.imagePath!);
+        }
+      });
+    }
+  }
+
+  Future<void> _saveUserData() async {
+    final user = User(
+      email: _loginController.text,
+      name: _nameController.text,
+      surname: _surnameController.text,
+      phone: _phoneController.text,
+      employee: _employeeController.text,
+      birthDate: _birthDateController.text,
+      imagePath: _profileImage?.path,
+    );
+
+    await getDatabaseService().saveUser(user);
+
+    if (!mounted) return; 
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Dados salvos com sucesso!')),
+    );
+  }
 
   /// Método para selecionar uma imagem do dispositivo ou navegador
   Future<void> _pickImage() async {
@@ -154,6 +216,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _phoneController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(12),
+                    ],
                     decoration: InputDecoration(
                       labelText: 'Telefone',
                       prefixIcon: const Icon(Icons.phone),
@@ -167,6 +234,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _employeeController,
+                    readOnly: true,
                     decoration: InputDecoration(
                       labelText: 'Funcionário',
                       prefixIcon: const Icon(Icons.work),
@@ -176,10 +244,35 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       filled: true,
                       fillColor: Colors.grey[100],
                     ),
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode()); // Fecha o teclado
+                      final result = await showDialog<String>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Você é funcionário da escola?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop('Sim'),
+                              child: const Text('Sim'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop('Não'),
+                              child: const Text('Não'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (result != null) {
+                        setState(() {
+                          _employeeController.text = result;
+                        });
+                      }
+                    },
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _birthDateController,
+                    readOnly: true, // Impede edição direta
                     decoration: InputDecoration(
                       labelText: 'Data de Nascimento',
                       prefixIcon: const Icon(Icons.calendar_today),
@@ -189,15 +282,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       filled: true,
                       fillColor: Colors.grey[100],
                     ),
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode()); // Fecha o teclado
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime.now(),
+                        locale: const Locale('pt', 'BR'),
+                      );
+                      if (pickedDate != null) {
+                        _birthDateController.text =
+                            "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
+                      }
+                    },
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
-                        log('Dados salvos!');
-                      },
+                      onPressed: _saveUserData,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[800], 
                         shape: RoundedRectangleBorder(
