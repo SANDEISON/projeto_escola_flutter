@@ -23,6 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       switch (user.role) {
+        case UserRole.admin:
+          Navigator.pushReplacementNamed(context, '/grades');
+          break;
         case UserRole.coordinator:
           Navigator.pushReplacementNamed(context, '/coordinator');
           break;
@@ -48,14 +51,21 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(controller: _usernameController, decoration: InputDecoration(labelText: 'Usuário')),
-            TextField(controller: _passwordController, obscureText: true, decoration: InputDecoration(labelText: 'Senha')),
+            TextField(
+              controller: _usernameController,
+              decoration: InputDecoration(labelText: 'Usuário'),
+            ),
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(labelText: 'Senha'),
+            ),
             SizedBox(height: 20),
             ElevatedButton(onPressed: _login, child: Text('Entrar')),
             if (_error != null) ...[
               SizedBox(height: 20),
               Text(_error!, style: TextStyle(color: Colors.red)),
-            ]
+            ],
           ],
         ),
       ),

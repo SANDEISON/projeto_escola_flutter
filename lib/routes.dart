@@ -3,6 +3,7 @@ import 'screens/login_screen.dart';
 import 'screens/coordinator_screen.dart';
 import 'screens/teacher_screen.dart';
 import 'screens/student_screen.dart';
+import 'screens/grades_screen.dart';
 
 class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -15,6 +16,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => TeacherScreen());
       case '/student':
         return MaterialPageRoute(builder: (_) => StudentScreen());
+      case '/grades':
+        return MaterialPageRoute(builder: (_) => GradesScreen());
       default:
         return MaterialPageRoute(builder: (_) => LoginScreen());
     }
