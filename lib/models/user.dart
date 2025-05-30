@@ -44,4 +44,26 @@ class User {
       imagePath: map['imagePath'],
     );
   }
+
+  User copyWith({
+    int? id,
+    String? email,
+    String? name,
+    String? surname,
+    String? phone,
+    String? employee,
+    String? birthDate,
+    String? imagePath,
+  }) {
+    return User(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      name: name ?? this.name,
+      surname: surname ?? this.surname,
+      phone: phone ?? this.phone,
+      employee: employee ?? this.employee,
+      birthDate: birthDate ?? this.birthDate,
+      imagePath: imagePath ?? this.imagePath,
+    );
+  }
 }

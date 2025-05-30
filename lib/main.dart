@@ -5,10 +5,11 @@ import 'dart:io' show File;
 import 'package:image_picker/image_picker.dart';
 import 'package:projeto_escola_flutter/models/user.dart';
 import 'database/database_gen.dart';
-import 'package:flutter/services.dart'; 
+import 'package:flutter/services.dart';
+import 'package:projeto_escola_flutter/models/phone_masked_formatter.dart';
+import 'dart:convert';
 
 void main() {
-  
   if (!kIsWeb) {
     // sqfliteFfiInit();
     // databaseFactory = databaseFactoryFfi;
@@ -30,10 +31,7 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('pt', 'BR'),
-        Locale('en', 'US'),
-      ],
+      supportedLocales: const [Locale('pt', 'BR'), Locale('en', 'US')],
     );
   }
 }
@@ -62,11 +60,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadUserData().then((_) {
+      if (_phoneController.text.isEmpty) {
+        _phoneController.text = '55829';
+      }
+    });
   }
 
   Future<void> _loadUserData() async {
-    final user = await getDatabaseService().getUser();  
+    final user = await getDatabaseService().getUser();
     if (user != null) {
       setState(() {
         _loginController.text = user.email;
@@ -75,27 +77,41 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _phoneController.text = user.phone;
         _employeeController.text = user.employee;
         _birthDateController.text = user.birthDate;
-        if (user.imagePath != null) {
+        if (kIsWeb && user.imagePath != null && user.imagePath!.isNotEmpty) {
+          _webImage = base64Decode(user.imagePath!);
+          _profileImage = null;
+        } else if (user.imagePath != null && user.imagePath!.isNotEmpty) {
           _profileImage = File(user.imagePath!);
+          _webImage = null;
+        } else {
+          _profileImage = null;
+          _webImage = null;
         }
       });
     }
   }
 
   Future<void> _saveUserData() async {
+    String? imagePathToSave;
+    if (kIsWeb && _webImage != null) {
+      imagePathToSave = base64Encode(_webImage!);
+    } else {
+      imagePathToSave = _profileImage?.path;
+    }
+
     final user = User(
       email: _loginController.text,
       name: _nameController.text,
       surname: _surnameController.text,
-      phone: _phoneController.text,
+      phone: PhoneMaskedFormatter.unmask(_phoneController.text),
       employee: _employeeController.text,
       birthDate: _birthDateController.text,
-      imagePath: _profileImage?.path,
+      imagePath: imagePathToSave,
     );
 
     await getDatabaseService().saveUser(user);
 
-    if (!mounted) return; 
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Dados salvos com sucesso!')),
@@ -133,12 +149,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text(
-          'Perfil de Usuário',
-          ),
-          ),
+      appBar: AppBar(centerTitle: true, title: const Text('Perfil de Usuário')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -152,18 +163,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.grey[300]!, 
-                          width: 3,
-                        ),
+                        border: Border.all(color: Colors.grey[300]!, width: 3),
                       ),
                       child: CircleAvatar(
                         radius: 60,
                         backgroundColor: Colors.grey[100],
                         backgroundImage: _getProfileImage(),
-                        child: (_profileImage == null && _webImage == null)
-                            ? const Icon(Icons.camera_alt, size: 40, color: Colors.grey)
-                            : null,
+                        child:
+                            (_profileImage == null && _webImage == null)
+                                ? const Icon(
+                                  Icons.camera_alt,
+                                  size: 40,
+                                  color: Colors.grey,
+                                )
+                                : null,
                       ),
                     ),
                   ),
@@ -179,6 +192,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     controller: _loginController,
                     decoration: InputDecoration(
                       labelText: 'Email',
+                      hintText: 'example@gmail.com', // Exemplo de email
                       prefixIcon: const Icon(Icons.email),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -217,10 +231,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   TextFormField(
                     controller: _phoneController,
                     keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(12),
-                    ],
+                    inputFormatters: [PhoneMaskedFormatter()],
                     decoration: InputDecoration(
                       labelText: 'Telefone',
                       prefixIcon: const Icon(Icons.phone),
@@ -245,22 +256,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       fillColor: Colors.grey[100],
                     ),
                     onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode()); // Fecha o teclado
+                      FocusScope.of(
+                        context,
+                      ).requestFocus(FocusNode()); // Fecha o teclado
                       final result = await showDialog<String>(
                         context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Você é funcionário da escola?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop('Sim'),
-                              child: const Text('Sim'),
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text(
+                                'Você é funcionário da escola?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.of(context).pop('Sim'),
+                                  child: const Text('Sim'),
+                                ),
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.of(context).pop('Não'),
+                                  child: const Text('Não'),
+                                ),
+                              ],
                             ),
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop('Não'),
-                              child: const Text('Não'),
-                            ),
-                          ],
-                        ),
                       );
                       if (result != null) {
                         setState(() {
@@ -284,11 +302,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                     onTap: () async {
                       FocusScope.of(context).requestFocus(FocusNode()); // Fecha o teclado
+                      final now = DateTime.now();
+                      final minDate = DateTime(1900);
+                      final maxDate = DateTime(now.year - 10, now.month, now.day);
                       DateTime? pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1900),
-                        lastDate: DateTime.now(),
+                        initialDate: maxDate,
+                        firstDate: minDate,
+                        lastDate: maxDate,
                         locale: const Locale('pt', 'BR'),
                       );
                       if (pickedDate != null) {
@@ -304,7 +325,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     child: ElevatedButton(
                       onPressed: _saveUserData,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[800], 
+                        backgroundColor: Colors.grey[800],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -314,7 +335,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white, 
+                          color: Colors.white,
                         ),
                       ),
                     ),

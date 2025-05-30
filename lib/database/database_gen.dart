@@ -4,6 +4,8 @@ import 'package:path/path.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
+import '../models/phone_masked_formatter.dart'; 
+
 
 class DatabaseGen {
   static final DatabaseGen instance = DatabaseGen._init();
@@ -35,38 +37,32 @@ class DatabaseGen {
         email TEXT NOT NULL,
         name TEXT NOT NULL,
         surname TEXT NOT NULL,
-        phone TEXT NOT NULL,
+        phone NUMBERS NOT NULL,
         employee TEXT NOT NULL,
-        birthDate TEXT NOT NULL,
+        birthDate DATE NOT NULL,
         imagePath TEXT
       )
     ''');
   }
 
-  Future<void> saveUser(User user) async {
+ Future<void> saveUser(User user) async {
     final db = await database;
+    final userToSave = user.copyWith(
+      phone: PhoneMaskedFormatter.unmask(user.phone), // <- Aqui aplicamos o unmask
+    );
     await db.insert(
       'users',
-      user.toMap(),
+      userToSave.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<User?> getUser() async {
+ Future<User?> getUser() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('users');
 
     if (maps.isNotEmpty) {
-      return User(
-        id: maps[0]['id'],
-        email: maps[0]['email'],
-        name: maps[0]['name'],
-        surname: maps[0]['surname'],
-        phone: maps[0]['phone'],
-        employee: maps[0]['employee'],
-        birthDate: maps[0]['birthDate'],
-        imagePath: maps[0]['imagePath'],
-      );
+      return User.fromMap(maps[0]);
     }
     return null;
   }
@@ -77,7 +73,6 @@ abstract class DatabaseService {
   Future<User?> getUser();
 }
 
-// Implementação para mobile (SQLite)
 class MobileDatabaseService implements DatabaseService {
   @override
   Future<void> saveUser(User user) => DatabaseGen.instance.saveUser(user);
@@ -86,14 +81,16 @@ class MobileDatabaseService implements DatabaseService {
   Future<User?> getUser() => DatabaseGen.instance.getUser();
 }
 
-// Exemplo de persistência usando shared_preferences para web
 class WebDatabaseService implements DatabaseService {
   static const String _userKey = 'user_data';
 
   @override
   Future<void> saveUser(User user) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userKey, jsonEncode(user.toMap()));
+    final userToSave = user.copyWith(
+      phone: PhoneMaskedFormatter.unmask(user.phone), // <- Também aqui
+    );
+    await prefs.setString(_userKey, jsonEncode(userToSave.toMap()));
   }
 
   @override
@@ -108,7 +105,6 @@ class WebDatabaseService implements DatabaseService {
   }
 }
 
-// Factory para retornar a implementação correta
 DatabaseService getDatabaseService() {
   if (kIsWeb) {
     return WebDatabaseService();
