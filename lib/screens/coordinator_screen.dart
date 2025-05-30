@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/teacher.dart';
 import '../models/student.dart';
 import '../mock_data/mock_users.dart';
+import '../models/subject.dart';
 
 class CoordinatorScreen extends StatefulWidget {
   @override
@@ -30,10 +31,27 @@ class _CoordinatorScreenState extends State<CoordinatorScreen> {
   void _addStudent() {
     final name = _studentNameController.text;
     final age = int.tryParse(_studentAgeController.text) ?? 0;
+    final defaultSubjects = [
+      "Matemática",
+      "Português",
+      "História",
+      "Geografia",
+      "Ciências",
+    ];
 
     if (name.isNotEmpty && age > 0) {
       setState(() {
-        mockStudents.add(Student(name: name, age: age));
+        //  Modifiquei um pouco aqui pra adicionar as materias pois agora a classe "student" tem uma lista de materias -GB23
+        mockStudents.add(
+          Student(
+            name: name,
+            age: age,
+            subjects:
+                defaultSubjects
+                    .map((sub) => Subject(name: sub, grades: {}))
+                    .toList(),
+          ),
+        );
         _studentNameController.clear();
         _studentAgeController.clear();
       });
@@ -69,16 +87,41 @@ class _CoordinatorScreenState extends State<CoordinatorScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Adicionar Professor", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            TextField(controller: _teacherNameController, decoration: InputDecoration(labelText: "Nome")),
-            TextField(controller: _teacherSubjectController, decoration: InputDecoration(labelText: "Disciplina")),
-            ElevatedButton(onPressed: _addTeacher, child: Text("Adicionar Professor")),
+            Text(
+              "Adicionar Professor",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextField(
+              controller: _teacherNameController,
+              decoration: InputDecoration(labelText: "Nome"),
+            ),
+            TextField(
+              controller: _teacherSubjectController,
+              decoration: InputDecoration(labelText: "Disciplina"),
+            ),
+            ElevatedButton(
+              onPressed: _addTeacher,
+              child: Text("Adicionar Professor"),
+            ),
             SizedBox(height: 24),
 
-            Text("Adicionar Aluno", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            TextField(controller: _studentNameController, decoration: InputDecoration(labelText: "Nome")),
-            TextField(controller: _studentAgeController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: "Idade")),
-            ElevatedButton(onPressed: _addStudent, child: Text("Adicionar Aluno")),
+            Text(
+              "Adicionar Aluno",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextField(
+              controller: _studentNameController,
+              decoration: InputDecoration(labelText: "Nome"),
+            ),
+            TextField(
+              controller: _studentAgeController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: "Idade"),
+            ),
+            ElevatedButton(
+              onPressed: _addStudent,
+              child: Text("Adicionar Aluno"),
+            ),
             SizedBox(height: 24),
 
             _buildTeacherList(),
