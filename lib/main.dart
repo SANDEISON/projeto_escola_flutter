@@ -9,7 +9,7 @@ class SchoolApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Escola App',
+      title: 'Escola Appp',
       initialRoute: '/',
       onGenerateRoute: AppRoutes.generateRoute,
     );
