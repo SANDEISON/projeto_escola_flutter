@@ -48,7 +48,7 @@ class DatabaseGen {
  Future<void> saveUser(User user) async {
     final db = await database;
     final userToSave = user.copyWith(
-      phone: PhoneMaskedFormatter.unmask(user.phone), // <- Aqui aplicamos o unmask
+      phone: PhoneMaskedFormatter.unmask(user.phone),
     );
     await db.insert(
       'users',
@@ -88,7 +88,7 @@ class WebDatabaseService implements DatabaseService {
   Future<void> saveUser(User user) async {
     final prefs = await SharedPreferences.getInstance();
     final userToSave = user.copyWith(
-      phone: PhoneMaskedFormatter.unmask(user.phone), // <- Também aqui
+      phone: PhoneMaskedFormatter.unmask(user.phone),
     );
     await prefs.setString(_userKey, jsonEncode(userToSave.toMap()));
   }

@@ -11,13 +11,10 @@ import 'dart:convert';
 
 void main() {
   if (!kIsWeb) {
-    // sqfliteFfiInit();
-    // databaseFactory = databaseFactoryFfi;
   }
   runApp(const MyApp());
 }
 
-/// Classe principal do aplicativo
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -36,7 +33,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// Tela de perfil do usuário
+
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
 
@@ -45,7 +42,6 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  // Controladores para os campos de texto
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
@@ -192,7 +188,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     controller: _loginController,
                     decoration: InputDecoration(
                       labelText: 'Email',
-                      hintText: 'example@gmail.com', // Exemplo de email
+                      hintText: 'example@gmail.com',
                       prefixIcon: const Icon(Icons.email),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -258,7 +254,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     onTap: () async {
                       FocusScope.of(
                         context,
-                      ).requestFocus(FocusNode()); // Fecha o teclado
+                      ).requestFocus(FocusNode());
                       final result = await showDialog<String>(
                         context: context,
                         builder:
@@ -290,7 +286,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _birthDateController,
-                    readOnly: true, // Impede edição direta
+                    readOnly: true,
                     decoration: InputDecoration(
                       labelText: 'Data de Nascimento',
                       prefixIcon: const Icon(Icons.calendar_today),
