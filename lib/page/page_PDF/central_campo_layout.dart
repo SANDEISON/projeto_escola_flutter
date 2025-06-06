@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:projeto_escola_flutter/page/page_PDF/ultil/my_tile.dart';
 import 'esquerdo_campo.dart';
+import 'package:projeto_escola_flutter/page/page_PDF/ultil/my_box.dart';
+
 
 
 class ResponsiveLayout extends StatelessWidget {
@@ -47,9 +50,31 @@ class _DesktopScaffoldState extends State<DesktopScaffold> {
               child: Column(
                 children: [
                   // first 4 boxes in grid
-    
+                  AspectRatio(
+                    aspectRatio: 8,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: GridView.builder(
+                        itemCount: 4,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4),
+                        itemBuilder: (context, index) {
+                          return MyBox();
+                        },
+                      ),
+                    ),
+                  ),
 
                   // list of previous days
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: 8,
+                      itemBuilder: (context, index) {
+                        return const MyTile();
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),

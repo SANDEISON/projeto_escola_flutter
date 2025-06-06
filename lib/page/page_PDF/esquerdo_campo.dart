@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_escola_flutter/Page_PDF/functions_pdf.dart';
 
 var defaultBackgroundColor = const Color.fromARGB(255, 221, 220, 220);
 var appBarColor = const Color.fromARGB(255, 0, 0, 0);
@@ -54,17 +53,16 @@ var myDrawer = Drawer(
           ),
         ),
       ),
-     Container(
-      padding: const EdgeInsets.all(8),
-      color: Colors.teal[200],
-     child:  ElevatedButton(
-          onPressed: () {
-            
-            Navigator.pop(MaterialApp(title: 'Navigation Basics', home: CreatePdfWidget()) as BuildContext);
-          },
-          child:  const CreatePdfWidget(),
+      Padding(
+        padding: tilePadding,
+        child: ListTile(
+          leading: Icon(Icons.logout),
+          title: Text(
+            'E V E N T O S',
+            style: drawerTextColor,
+          ),
         ),
-    ),
+      ),
     ],
   ),
 );
