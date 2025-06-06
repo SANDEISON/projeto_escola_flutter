@@ -33,7 +33,8 @@ class _CoordinatorScreenState extends State<CoordinatorScreen> {
 
     if (name.isNotEmpty && age > 0) {
       setState(() {
-        mockStudents.add(Student(name: name, age: age));
+        // Add the required 'subjects' parameter when creating a Student instance
+        mockStudents.add(Student(name: name, age: age, subjects: []));
         _studentNameController.clear();
         _studentAgeController.clear();
       });
