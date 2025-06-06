@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 class Subject {
   String name;
   Map<String, double> grades;
@@ -18,6 +19,18 @@ class Subject {
       return "Final";
     } else {
       return "Reprovado(a)";
+    }
+  }
+
+  Color get statuscolor {
+    //adicionei
+    double avg = average();
+    if (avg >= 7) {
+      return const Color.fromARGB(255, 59, 203, 107);
+    } else if (avg >= 4) {
+      return const Color.fromARGB(255, 200, 195, 90);
+    } else {
+      return const Color.fromARGB(255, 212, 60, 60);
     }
   }
 }

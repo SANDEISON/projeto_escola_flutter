@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'subject.dart';
 
 class Student {
@@ -27,6 +28,17 @@ class Student {
       return "Recuperação em alguma(s) materia(s))";
     } else {
       return "Reprovado(a) em alguma(s) materia(s)";
+    }
+  }
+  Color get statuscolor {
+    //adicionei
+    double avg = averageGrade();
+    if (avg >= 7) {
+      return const Color.fromARGB(255, 59, 203, 107);
+    } else if (avg >= 4) {
+      return const Color.fromARGB(255, 200, 195, 90);
+    } else {
+      return const Color.fromARGB(255, 212, 60, 60);
     }
   }
 }
