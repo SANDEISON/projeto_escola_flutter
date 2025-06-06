@@ -83,7 +83,7 @@ lib/
 - **Gerar PDF: ANTONIO GABRIEL E JOAO GUILHERME** (Branch: antonio_e_guilherme) 
 - **JOAO VICTOR AMORIM E LEONARDO DANTAS**
 - **Portal de notas: Gabriel Alessandro Da Luz Santos Do Nascimento e Enzo Rafael Gomes De Melo**
-- **Tela de Login: Rian Pablo Tavares Barbosa, José Rafael Oliveira Palmeira de Souza**
+- **Tela de Cadastro de Professor: Rian Pablo Tavares Barbosa, José Rafael Oliveira Palmeira de Souza**
 
 
     
