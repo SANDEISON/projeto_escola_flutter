@@ -1,6 +1,6 @@
 name: projeto_escolar
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -10,11 +10,13 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.1.5
+  animations: ^2.0.11
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  animations: ^2.0.11
 
 flutter:
   uses-material-design: true
