@@ -1,43 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void main() => runApp(const Cadastro());
+void main() {
+  runApp(const Cadastro());
+}
 
 class Cadastro extends StatelessWidget {
   const Cadastro({super.key});
+
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: "Tela de cadastro dos alunos",
-    theme: ThemeData(
-      primarySwatch: Colors.blue,
-      scaffoldBackgroundColor: Colors.white,
-    ),
-    home: const TelaCadastro(),
-  );
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "Tela de cadastro dos alunos",
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: const Color(0xFF223263),
+      ),
+      home: const TelaCadastro(),
+    );
+  }
 }
 
 class TelaCadastro extends StatefulWidget {
   const TelaCadastro({super.key});
+
   @override
   State<TelaCadastro> createState() => _TelaCadastroState();
 }
 
 class _TelaCadastroState extends State<TelaCadastro> {
   final _formKey = GlobalKey<FormState>();
-  final _nomeController = TextEditingController(),
-      _emailController = TextEditingController(),
-      _senhaController = TextEditingController();
-  final _telefoneController = TextEditingController(),
-      _cpfController = TextEditingController(),
-      _rgController = TextEditingController();
+  final _nomeController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _senhaController = TextEditingController();
+  final _telefoneController = TextEditingController();
+  final _cpfController = TextEditingController();
+  final _rgController = TextEditingController();
   final _dataNascimentoController = TextEditingController();
   String? _estadoCivilSelecionado;
-  final _cidadeNatalController = TextEditingController(),
-      _estadoController = TextEditingController(),
-      _anoConclusaoController = TextEditingController();
-  final _nomeMaeController = TextEditingController(),
-      _enderecoController = TextEditingController(),
-      _cepController = TextEditingController();
+  final _cidadeNatalController = TextEditingController();
+  final _estadoController = TextEditingController();
+  final _anoConclusaoController = TextEditingController();
+  final _nomeMaeController = TextEditingController();
+  final _enderecoController = TextEditingController();
+  final _cepController = TextEditingController();
   String? _trabalhaAtualmenteSelecionado;
   final _cursoDesejadoController = TextEditingController();
   String? _turnoSelecionado;
@@ -51,47 +57,33 @@ class _TelaCadastroState extends State<TelaCadastro> {
   final List<String> _simNao = ['Sim', 'Não'];
   final List<String> _turnos = ['Manhã', 'Tarde', 'Noite'];
 
-  @override
-  void dispose() {
-    _nomeController.dispose();
-    _emailController.dispose();
-    _senhaController.dispose();
-    _telefoneController.dispose();
-    _cpfController.dispose();
-    _rgController.dispose();
-    _dataNascimentoController.dispose();
-    _cidadeNatalController.dispose();
-    _estadoController.dispose();
-    _anoConclusaoController.dispose();
-    _nomeMaeController.dispose();
-    _enderecoController.dispose();
-    _cepController.dispose();
-    _cursoDesejadoController.dispose();
-    super.dispose();
-  }
-
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
-      helpText: 'Selecione sua data de nascimento',
-      cancelText: 'Cancelar',
-      confirmText: 'Selecionar',
     );
-    if (picked != null)
-      setState(
-        () =>
-            _dataNascimentoController.text =
-                "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}",
-      );
+    if (picked != null) {
+      setState(() {
+        _dataNascimentoController.text =
+            "${picked.day}/${picked.month}/${picked.year}";
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    const double spacing = 24.0; 
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Cadastro dos Alunos')),
+      appBar: AppBar(
+        title: const Text(
+          'Cadastro dos Alunos',
+          style: TextStyle(color: Color(0xFF223263)), 
+        ),
+        backgroundColor: const Color(0xFFE7CB3B), 
+      ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
@@ -103,203 +95,325 @@ class _TelaCadastroState extends State<TelaCadastro> {
                 _buildTextField(
                   label: 'Nome',
                   controller: _nomeController,
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite seu nome.'
-                              : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite seu nome.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'Email',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite seu email.'
-                              : (!value.contains('@')
-                                  ? 'Por favor, digite um email válido.'
-                                  : null),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite seu email.';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Por favor, digite um email válido.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'Senha',
                   controller: _senhaController,
                   obscureText: true,
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite sua senha.'
-                              : (value.length < 6
-                                  ? 'A senha deve ter pelo menos 6 caracteres.'
-                                  : null),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite sua senha.';
+                    }
+                    if (value.length < 6) {
+                      return 'A senha deve ter pelo menos 6 caracteres.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'Telefone',
                   controller: _telefoneController,
                   keyboardType: TextInputType.phone,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite seu telefone.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'CPF',
                   controller: _cpfController,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite seu CPF.'
-                              : (value.length != 11 ? 'CPF inválido.' : null),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite seu CPF.';
+                    }
+                    if (value.length != 11) {
+                      return 'CPF inválido.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'RG (Opcional)',
                   controller: _rgController,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 TextFormField(
                   controller: _dataNascimentoController,
                   style: const TextStyle(color: Colors.black),
-                  readOnly: true,
-                  onTap: () => _selectDate(context),
-                  decoration: _inputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Data de Nascimento',
+                    labelStyle: const TextStyle(color: Colors.black), 
+                    filled: true,
+                    fillColor: Colors.white, 
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.blue),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     suffixIcon: const Icon(
                       Icons.calendar_today,
                       color: Colors.blueGrey,
                     ),
                   ),
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, selecione a data de nascimento.'
-                              : null,
+                  readOnly: true,
+                  onTap: () => _selectDate(context),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, selecione a data de nascimento.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
-                _buildDropdownField(
-                  label: 'Estado Civil',
+                const SizedBox(height: spacing), 
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'Estado Civil',
+                    labelStyle: const TextStyle(color: Colors.black), 
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.blue),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white, 
+                  ),
                   value: _estadoCivilSelecionado,
-                  items: _estadosCivis,
-                  onChanged:
-                      (newValue) =>
-                          setState(() => _estadoCivilSelecionado = newValue),
-                  validator:
-                      (value) =>
-                          value == null
-                              ? 'Por favor, selecione o estado civil.'
-                              : null,
+                  items: _estadosCivis.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _estadoCivilSelecionado = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Por favor, selecione o estado civil.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'Cidade Natal',
                   controller: _cidadeNatalController,
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite sua cidade natal.'
-                              : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite sua cidade natal.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'Estado (UF)',
                   controller: _estadoController,
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite seu estado.'
-                              : (value.length != 2
-                                  ? 'Digite a sigla do estado (ex: AL).'
-                                  : null),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite seu estado.';
+                    }
+                    if (value.length != 2) {
+                      return 'Digite a sigla do estado (ex: AL).';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'Ano de Conclusão do Ensino Médio',
                   controller: _anoConclusaoController,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite o ano de conclusão.'
-                              : (value.length != 4
-                                  ? 'Digite um ano válido.'
-                                  : null),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite o ano de conclusão.';
+                    }
+                    if (value.length != 4) {
+                      return 'Digite um ano válido.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'Nome da Mãe',
                   controller: _nomeMaeController,
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite o nome da sua mãe.'
-                              : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite o nome da sua mãe.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'Endereço',
                   controller: _enderecoController,
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite seu endereço.'
-                              : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite seu endereço.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'CEP',
                   controller: _cepController,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite seu CEP.'
-                              : (value.length != 8 ? 'CEP inválido.' : null),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite seu CEP.';
+                    }
+                    if (value.length != 8) {
+                      return 'CEP inválido.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
-                _buildDropdownField(
-                  label: 'Trabalha Atualmente?',
+                const SizedBox(height: spacing), 
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'Trabalha Atualmente?',
+                    labelStyle: const TextStyle(color: Colors.black), 
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.blue),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white, 
+                  ),
                   value: _trabalhaAtualmenteSelecionado,
-                  items: _simNao,
-                  onChanged:
-                      (newValue) => setState(
-                        () => _trabalhaAtualmenteSelecionado = newValue,
+                  items: _simNao.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: const TextStyle(color: Colors.black),
                       ),
-                  validator:
-                      (value) =>
-                          value == null
-                              ? 'Por favor, selecione uma opção.'
-                              : null,
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _trabalhaAtualmenteSelecionado = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Por favor, selecione uma opção.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
+                const SizedBox(height: spacing), 
                 _buildTextField(
                   label: 'Curso que Deseja Realizar',
                   controller: _cursoDesejadoController,
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Por favor, digite o curso desejado.'
-                              : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, digite o curso desejado.';
+                    }
+                    return null;
+                  },
                 ),
-                _verticalSpace(),
-                _buildDropdownField(
-                  label: 'Turno',
+                const SizedBox(height: spacing), 
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'Turno',
+                    labelStyle: const TextStyle(color: Colors.black), 
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.blue),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white, 
+                  ),
                   value: _turnoSelecionado,
-                  items: _turnos,
-                  onChanged:
-                      (newValue) =>
-                          setState(() => _turnoSelecionado = newValue),
-                  validator:
-                      (value) =>
-                          value == null
-                              ? 'Por favor, selecione o turno.'
-                              : null,
+                  items: _turnos.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _turnoSelecionado = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Por favor, selecione o turno.';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -310,21 +424,15 @@ class _TelaCadastroState extends State<TelaCadastro> {
                       print('Telefone: ${_telefoneController.text}');
                       print('CPF: ${_cpfController.text}');
                       print('RG: ${_rgController.text}');
-                      print(
-                        'Data de Nascimento: ${_dataNascimentoController.text}',
-                      );
+                      print('Data de Nascimento: ${_dataNascimentoController.text}');
                       print('Estado Civil: $_estadoCivilSelecionado');
                       print('Cidade Natal: ${_cidadeNatalController.text}');
                       print('Estado: ${_estadoController.text}');
-                      print(
-                        'Ano de Conclusão: ${_anoConclusaoController.text}',
-                      );
+                      print('Ano de Conclusão: ${_anoConclusaoController.text}');
                       print('Nome da Mãe: ${_nomeMaeController.text}');
                       print('Endereço: ${_enderecoController.text}');
                       print('CEP: ${_cepController.text}');
-                      print(
-                        'Trabalha Atualmente: $_trabalhaAtualmenteSelecionado',
-                      );
+                      print('Trabalha Atualmente: $_trabalhaAtualmenteSelecionado');
                       print('Curso Desejado: ${_cursoDesejadoController.text}');
                       print('Turno: $_turnoSelecionado');
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -344,26 +452,6 @@ class _TelaCadastroState extends State<TelaCadastro> {
     );
   }
 
-  InputDecoration _inputDecoration({
-    required String labelText,
-    Widget? suffixIcon,
-  }) => InputDecoration(
-    labelText: labelText,
-    labelStyle: const TextStyle(color: Colors.black54),
-    filled: true,
-    fillColor: Colors.grey[200],
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-    enabledBorder: OutlineInputBorder(
-      borderSide: const BorderSide(color: Colors.grey),
-      borderRadius: BorderRadius.circular(8),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderSide: const BorderSide(color: Colors.blue),
-      borderRadius: BorderRadius.circular(8),
-    ),
-    suffixIcon: suffixIcon,
-  );
-
   Widget _buildTextField({
     required String label,
     required TextEditingController controller,
@@ -371,38 +459,29 @@ class _TelaCadastroState extends State<TelaCadastro> {
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
-  }) => TextFormField(
-    controller: controller,
-    obscureText: obscureText,
-    keyboardType: keyboardType,
-    inputFormatters: inputFormatters,
-    style: const TextStyle(color: Colors.black),
-    decoration: _inputDecoration(labelText: label),
-    validator: validator,
-  );
-
-  Widget _buildDropdownField({
-    required String label,
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-    String? Function(String?)? validator,
-  }) => DropdownButtonFormField<String>(
-    decoration: _inputDecoration(labelText: label),
-    value: value,
-    isExpanded: true,
-    items:
-        items
-            .map(
-              (val) => DropdownMenuItem<String>(
-                value: val,
-                child: Text(val, style: const TextStyle(color: Colors.black)),
-              ),
-            )
-            .toList(),
-    onChanged: onChanged,
-    validator: validator,
-  );
-
-  Widget _verticalSpace({double height = 16}) => SizedBox(height: height);
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
+      style: const TextStyle(color: Colors.black),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.black), 
+        filled: true,
+        fillColor: Colors.white, 
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.blue),
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      validator: validator,
+    );
+  }
 }
